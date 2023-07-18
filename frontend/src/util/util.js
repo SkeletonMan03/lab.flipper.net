@@ -45,7 +45,7 @@ class Operation {
 }
 
 function fetchChannels (target) {
-  return fetch('https://update.flipperzero.one/firmware/directory.json')
+  return fetch('https://up.unleashedflip.com/directory.json')
     .then((response) => {
       if (response.status >= 400) {
         throw new Error('Failed to fetch firmware channels (' + response.status + ')')

@@ -166,7 +166,7 @@
         <q-space />
 
         <div class="column items-end q-ml-md">
-          <span class="text-grey-7">Version:</span>
+          <span v-if="app.installedVersion.version" class="text-grey-7">Version:</span>
           <b>{{ app.installedVersion.version }}</b>
         </div>
         <div class="q-ml-md" style="width: 80px;">

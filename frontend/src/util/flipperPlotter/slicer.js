@@ -13,7 +13,25 @@
 import { Bitbuffer } from './bitbuffer.js'
 
 export function sliceGuess (pulses, guess) {
-  if (guess.modulation === 'PCM') { return slicePCM(pulses, guess) } else if (guess.modulation === 'MC') { return sliceMC(pulses, guess) } else if (guess.modulation === 'PPM') { return slicePPM(pulses, guess) } else if (guess.modulation === 'PWM') { return slicePWM(pulses, guess) } else if (guess.modulation === 'DM') { return sliceDM(pulses, guess) } else if (guess.modulation === 'NRZI') { return sliceNRZI(pulses, guess) } else if (guess.modulation === 'CMI') { return sliceCMI(pulses, guess) } else if (guess.modulation === 'PIWM') { return slicePIWM(pulses, guess) } else { return [] }
+  if (guess.modulation === 'PCM') {
+    return slicePCM(pulses, guess)
+  } else if (guess.modulation === 'MC') {
+    return sliceMC(pulses, guess)
+  } else if (guess.modulation === 'PPM') {
+    return slicePPM(pulses, guess)
+  } else if (guess.modulation === 'PWM') {
+    return slicePWM(pulses, guess)
+  } else if (guess.modulation === 'DM') {
+    return sliceDM(pulses, guess)
+  } else if (guess.modulation === 'NRZI') {
+    return sliceNRZI(pulses, guess)
+  } else if (guess.modulation === 'CMI') {
+    return sliceCMI(pulses, guess)
+  } else if (guess.modulation === 'PIWM') {
+    return slicePIWM(pulses, guess)
+  } else {
+    return []
+  }
 }
 
 // returned hints array contains triples of start,end,symbol
@@ -40,14 +58,14 @@ export function sliceNRZ (pulses, guess) {
 
   let x = 0
   for (let j = 0; j < pulses.length; j += 1) {
-    const symbol = 1 - j % 2 // even: 1, odd: 0
+    const symbol = 1 - (j % 2) // even: 1, odd: 0
     const w = pulses[j] // mark or space
     if (gap && w > gap) {
       bits.pushBreak()
     } else {
       const cnt = ~~(w / short + 0.5)
       for (let k = 0; k < cnt; ++k) {
-        hints.push([x + w / cnt * k, x + w / cnt * (k + 1), symbol])
+        hints.push([x + (w / cnt) * k, x + (w / cnt) * (k + 1), symbol])
         bits.push(symbol)
       }
     }
@@ -79,7 +97,7 @@ export function sliceRZ (pulses, guess) {
       x += m + s
       continue
     }
-    let onew = m * long / short // estimate the 1-bit width
+    let onew = (m * long) / short // estimate the 1-bit width
     let zs = s + m - onew // estimate 0-bits width
     if (zs < long / 2) {
       onew = m + s // no 0-bits
@@ -95,7 +113,7 @@ export function sliceRZ (pulses, guess) {
     }
     const cnt = ~~(zs / long + 0.5)
     for (let k = 0; k < cnt; ++k) {
-      hints.push([x + zs * k / cnt, x + zs * (k + 1) / cnt, '0'])
+      hints.push([x + (zs * k) / cnt, x + (zs * (k + 1)) / cnt, '0'])
       bits.pushZero()
     }
     x += zs
@@ -171,7 +189,9 @@ export function slicePWM (pulses, guess) {
     const x0 = x
     let x1 = x + m + s
     // break on gaps
-    if (s > gap) { x1 = x + m + gap }
+    if (s > gap) {
+      x1 = x + m + gap
+    }
     x += m + s
 
     if (m > shortl && m < shortu) {
@@ -229,7 +249,8 @@ export function sliceMC (pulses, guess) {
         hints.push([x1, x + mark, '0'])
         bits.pushZero()
         x1 = x + mark
-      } else { // aligned
+      } else {
+        // aligned
         x1 = x
       }
       aligned = !aligned
@@ -238,7 +259,8 @@ export function sliceMC (pulses, guess) {
         hints.push([x1, x + mark / 2, '0'])
         bits.pushZero()
         x1 = x + mark / 2
-      } else { // aligned
+      } else {
+        // aligned
         // error
         bits.pushBreak()
         x1 = x + mark / 2
@@ -249,7 +271,8 @@ export function sliceMC (pulses, guess) {
         hints.push([x1, x + mark / mcnt, '0'])
         bits.pushZero()
         x1 = x + mark - mark / mcnt
-      } else { // aligned
+      } else {
+        // aligned
         // error
         x1 = x + mark - mark / mcnt
       }
@@ -262,7 +285,8 @@ export function sliceMC (pulses, guess) {
         hints.push([x1, x + mark + space, '1'])
         bits.pushOne()
         x1 = x + mark + space
-      } else { // aligned
+      } else {
+        // aligned
         x1 = x + mark
       }
       aligned = !aligned
@@ -271,7 +295,8 @@ export function sliceMC (pulses, guess) {
         hints.push([x1, x + mark + space / 2, '1'])
         bits.pushOne()
         x1 = x + mark + space / 2
-      } else { // aligned
+      } else {
+        // aligned
         // error
         bits.pushBreak()
         x1 = x + mark + space / 2
@@ -282,7 +307,8 @@ export function sliceMC (pulses, guess) {
         hints.push([x1, x + mark + space / scnt, '1'])
         bits.pushOne()
         x1 = x + mark + space - space / scnt
-      } else { // aligned
+      } else {
+        // aligned
         // error
         x1 = x + mark + space - space / scnt
       }
@@ -424,7 +450,7 @@ export function sliceCMI (pulses, guess) {
       if (!x1) x1 = x - mark // first bit
       hints.push([x1, x + mark, '0'])
       bits.pushZero()
-      x1 = x + mark + space * 2 / 3
+      x1 = x + mark + (space * 2) / 3
       hints.push([x + mark, x1, '1'])
       bits.pushOne()
     } else if (mcnt === 2 && scnt === 1) {
@@ -440,7 +466,7 @@ export function sliceCMI (pulses, guess) {
     } else if (mcnt === 2 && scnt === 3) {
       hints.push([x1, x + mark, '1'])
       bits.pushOne()
-      x1 = x + mark + space * 2 / 3
+      x1 = x + mark + (space * 2) / 3
       hints.push([x + mark, x1, '1'])
       bits.pushOne()
     } else if (mcnt === 3 && scnt === 1) {
@@ -464,15 +490,17 @@ export function sliceCMI (pulses, guess) {
       bits.pushOne()
       hints.push([x + mark / 3, x + mark, '1'])
       bits.pushOne()
-      hints.push([x + mark, x + mark + space * 3 / 2, '1'])
+      hints.push([x + mark, x + mark + (space * 3) / 2, '1'])
       bits.pushOne()
-      x1 = x + mark + space * 3 / 2
-    } else if (mcnt === 1) { // last zero
+      x1 = x + mark + (space * 3) / 2
+    } else if (mcnt === 1) {
+      // last zero
       hints.push([x1, x + mark, '0'])
       bits.pushZero()
       bits.pushBreak()
       x1 = x + mark
-    } else if (mcnt === 2) { // last one
+    } else if (mcnt === 2) {
+      // last one
       hints.push([x1, x + mark, '1'])
       bits.pushOne()
       bits.pushBreak()

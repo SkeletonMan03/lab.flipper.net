@@ -80,7 +80,7 @@ export class Histogram {
       for (bin = 0; bin < this.bins.length; ++bin) {
         const bn = data[n]
         const bm = this.bins[bin].mean
-        if (Math.abs(bn - bm) < (tolerance * Math.max(bn, bm))) {
+        if (Math.abs(bn - bm) < tolerance * Math.max(bn, bm)) {
           this.bins[bin].add(data[n])
           break // Match found! Data added to existing bin
         }
@@ -99,7 +99,8 @@ export class Histogram {
 
   /// Swap two bins in histogram
   swap_bins (index1, index2) {
-    if ((index1 < this.bins.length) && (index2 < this.bins.length)) { // Avoid out of bounds
+    if (index1 < this.bins.length && index2 < this.bins.length) {
+      // Avoid out of bounds
       const tempbin = this.bins[index1]
       this.bins[index1] = this.bins[index2]
       this.bins[index2] = tempbin
@@ -141,7 +142,7 @@ export class Histogram {
         const bn = this.bins[n].mean
         const bm = this.bins[m].mean
         // if within tolerance
-        if (Math.abs(bn - bm) < (tolerance * Math.max(bn, bm))) {
+        if (Math.abs(bn - bm) < tolerance * Math.max(bn, bm)) {
           // Fuse data for bin[n] and bin[m]
           this.bins[n].fuse(this.bins[m])
           // Delete bin[m]
@@ -177,7 +178,11 @@ export class Histogram {
   console_print () {
     for (let n = 0; n < this.bins.length; ++n) {
       const b = this.bins[n]
-      console.log(`[${n}] ${b.count} × ${b.mean.toFixed(1)} ±${b.devi.toFixed(1)} µs [${b.min};${b.max}]`)
+      console.log(
+        `[${n}] ${b.count} × ${b.mean.toFixed(1)} ±${b.devi.toFixed(1)} µs [${
+          b.min
+        };${b.max}]`
+      )
     }
   }
 
@@ -185,7 +190,11 @@ export class Histogram {
     const ret = []
     for (let n = 0; n < this.bins.length; ++n) {
       const b = this.bins[n]
-      ret.push(`${b.count}× ${b.mean.toFixed(1)} <small>±${b.devi.toFixed(1)}</small> µs`)
+      ret.push(
+        `${b.count}× ${b.mean.toFixed(1)} <small>±${b.devi.toFixed(
+          1
+        )}</small> µs`
+      )
     }
     return ret.join(separator)
   }
@@ -285,7 +294,11 @@ export class Analyzer {
         tolerance: (long - short) * 0.4,
         reset: gaps.bins[gaps.length - 1].max * 1.2 // Set limit above biggest gap
       }
-    } else if (pulses.length === 2 && gaps.length === 2 && periods.length === 1) {
+    } else if (
+      pulses.length === 2 &&
+      gaps.length === 2 &&
+      periods.length === 1
+    ) {
       const short = pulses.bins[0].mean
       const long = pulses.bins[1].mean
       return {
@@ -296,7 +309,11 @@ export class Analyzer {
         tolerance: (long - short) * 0.4,
         reset: gaps.bins[gaps.length - 1].max * 1.2 // Set limit above biggest gap
       }
-    } else if (pulses.length === 2 && gaps.length === 2 && periods.length === 3) {
+    } else if (
+      pulses.length === 2 &&
+      gaps.length === 2 &&
+      periods.length === 3
+    ) {
       const short = pulses.bins[0].mean
       return {
         name: 'Manchester coding (PCM)',
@@ -317,12 +334,20 @@ export class Analyzer {
         tolerance: (long - short) * 0.4,
         reset: gaps.bins[gaps.length - 1].max * 1.2 // Set limit above biggest gap
       }
-    } else if ((pulses.length >= 3 && gaps.length >= 3) &&
-            (Math.abs(pulses.bins[1].mean - 2 * pulses.bins[0].mean) <= pulses.bins[0].mean / 8) && // Pulses are multiples of shortest pulse
-            (Math.abs(pulses.bins[2].mean - 3 * pulses.bins[0].mean) <= pulses.bins[0].mean / 8) &&
-            (Math.abs(gaps.bins[0].mean - pulses.bins[0].mean) <= pulses.bins[0].mean / 8) && // Gaps are multiples of shortest pulse
-            (Math.abs(gaps.bins[1].mean - 2 * pulses.bins[0].mean) <= pulses.bins[0].mean / 8) &&
-            (Math.abs(gaps.bins[2].mean - 3 * pulses.bins[0].mean) <= pulses.bins[0].mean / 8)) {
+    } else if (
+      pulses.length >= 3 &&
+      gaps.length >= 3 &&
+      Math.abs(pulses.bins[1].mean - 2 * pulses.bins[0].mean) <=
+        pulses.bins[0].mean / 8 && // Pulses are multiples of shortest pulse
+      Math.abs(pulses.bins[2].mean - 3 * pulses.bins[0].mean) <=
+        pulses.bins[0].mean / 8 &&
+      Math.abs(gaps.bins[0].mean - pulses.bins[0].mean) <=
+        pulses.bins[0].mean / 8 && // Gaps are multiples of shortest pulse
+      Math.abs(gaps.bins[1].mean - 2 * pulses.bins[0].mean) <=
+        pulses.bins[0].mean / 8 &&
+      Math.abs(gaps.bins[2].mean - 3 * pulses.bins[0].mean) <=
+        pulses.bins[0].mean / 8
+    ) {
       return {
         name: 'Pulse Code Modulation (Not Return to Zero)',
         modulation: 'PCM',
@@ -439,25 +464,43 @@ formatter.format(0.5)
     const guess = this.guess()
     if (timings) {
       timings.innerHTML = `<table>
-            <tr><th>Pulses</th><td>${this.hist_pulses.string_print('</td><td>')}</td></tr>
-            <tr><th>Gaps</th><td>${this.hist_gaps.string_print('</td><td>')}</td></tr>
-            <tr><th>Periods</th><td>${this.hist_periods.string_print('</td><td>')}</td></tr>
-            <tr><th>Timings</th><td>${this.hist_timings.string_print('</td><td>')}</td></tr>
+            <tr><th align="left">Pulses</th><td>${this.hist_pulses.string_print(
+              '</td><td>'
+            )}</td></tr>
+            <tr><th align="left">Gaps</th><td>${this.hist_gaps.string_print(
+              '</td><td>'
+            )}</td></tr>
+            <tr><th align="left">Periods</th><td>${this.hist_periods.string_print(
+              '</td><td>'
+            )}</td></tr>
+            <tr><th align="left">Timings</th><td>${this.hist_timings.string_print(
+              '</td><td>'
+            )}</td></tr>
             </table>
             `
     }
     if (messages) {
       messages.innerHTML = `
-            <div><small>DC bias (Pulse/Gap skew): ${(this.pulse_gap_skew * 100).toFixed(1)}%</small><br>
+            <div><small>DC bias (Pulse/Gap skew): ${(
+              this.pulse_gap_skew * 100
+            ).toFixed(1)}%</small><br>
             Guessing modulation: <strong>${guess.name}</strong><br>
             modulation: <strong>${guess.modulation || 'unknown'}</strong>
-            short: <strong>${guess.short ? guess.short.toFixed(1) : '-'}</strong>
+            short: <strong>${
+              guess.short ? guess.short.toFixed(1) : '-'
+            }</strong>
             long: <strong>${guess.long ? guess.long.toFixed(1) : '-'}</strong>
             sync: <strong>${guess.sync ? guess.sync.toFixed(1) : '-'}</strong>
             gap: <strong>${guess.gap ? guess.gap.toFixed(1) : '-'}</strong>
-            reset: <strong>${guess.reset ? guess.reset.toFixed(1) : '-'}</strong><br>
-            <small>RfRaw (rx): <strong>${this.rfrawB1 ? this.rfrawB1 : '-'}</strong></small><br>
-            <small>RfRaw (tx): <strong>${this.rfrawB0 ? this.rfrawB0 : '-'}</strong></small>
+            reset: <strong>${
+              guess.reset ? guess.reset.toFixed(1) : '-'
+            }</strong><br>
+            <small>RfRaw (rx): <strong>${
+              this.rfrawB1 ? this.rfrawB1 : '-'
+            }</strong></small><br>
+            <small>RfRaw (tx): <strong>${
+              this.rfrawB0 ? this.rfrawB0 : '-'
+            }</strong></small>
             </div>
             `
     }

@@ -20,7 +20,7 @@ const autoranges = [
   { name: 'giga', scale: 1e9, prefix: 'G' },
   { name: 'mega', scale: 1e6, prefix: 'M' },
   { name: 'kilo', scale: 1e3, prefix: 'k' },
-  { name: '', scale: 1e0, prefix: '' },
+  { name: '', scale: 1, prefix: '' },
   { name: 'milli', scale: 1e-3, prefix: 'm' },
   { name: 'micro', scale: 1e-6, prefix: 'µ' },
   { name: 'nano', scale: 1e-9, prefix: 'n' },
@@ -33,11 +33,15 @@ const autoranges = [
 
 /** Determine divisor and SI prefix. */
 function autorange (num, min_int = 10.0) {
-  if (num === 0.0) { return autoranges[8] }
+  if (num === 0.0) {
+    return autoranges[8]
+  }
 
   num = num / min_int
   for (let i = 0; i < autoranges.length; ++i) {
-    if (num >= autoranges[i].scale) { return autoranges[i] }
+    if (num >= autoranges[i].scale) {
+      return autoranges[i]
+    }
   }
   return autoranges[autoranges.length - 1]
 }
@@ -50,7 +54,7 @@ const autoranges_time = [
   { name: 'day', scale: 86400, prefix: 'D' },
   { name: 'hour', scale: 3600, prefix: 'h' },
   { name: 'minute', scale: 60, prefix: 'm' },
-  { name: 'second', scale: 1e0, prefix: 's' },
+  { name: 'second', scale: 1, prefix: 's' },
   { name: 'milli', scale: 1e-3, prefix: 'ms' },
   { name: 'micro', scale: 1e-6, prefix: 'µs' },
   { name: 'nano', scale: 1e-9, prefix: 'ns' },
@@ -63,11 +67,15 @@ const autoranges_time = [
 
 /** Determine SI divisor or Sexagesimal multiplier and suffix. */
 function autorange_time (num, min_int = 10.0) {
-  if (num === 0.0) { return autoranges_time[8] }
+  if (num === 0.0) {
+    return autoranges_time[8]
+  }
 
   num = num / min_int
   for (let i = 0; i < autoranges_time.length; ++i) {
-    if (num >= autoranges_time[i].scale) { return autoranges_time[i] }
+    if (num >= autoranges_time[i].scale) {
+      return autoranges_time[i]
+    }
   }
   return autoranges_time[autoranges_time.length - 1]
 }

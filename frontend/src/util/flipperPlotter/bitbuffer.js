@@ -46,7 +46,9 @@ export class Bitbuffer {
       this.pushNibble(n)
     }
     // set length if given
-    if (len >= 0) { this.len = len }
+    if (len >= 0) {
+      this.len = len
+    }
   }
 
   pushZero () {
@@ -58,12 +60,16 @@ export class Bitbuffer {
   }
 
   pushSymbol (s) {
-    if (s === '0') { this.push(0) } else if (s === '1') { this.push(1) }
+    if (s === '0') {
+      this.push(0)
+    } else if (s === '1') {
+      this.push(1)
+    }
   }
 
   push (bit) {
     bit = bit ? 0x80 : 0
-    this.bytes[~~(this.len / 8)] |= bit >> (this.len % 8)
+    this.bytes[~~(this.len / 8)] |= bit >> this.len % 8
     this.len += 1
   }
 
@@ -104,7 +110,9 @@ export class Bitbuffer {
       } else {
         s += ' '
         s += (b >> 4).toString(16).toUpperCase()
-        if (j + 4 < this.len) { s += (b & 0xf).toString(16).toUpperCase() }
+        if (j + 4 < this.len) {
+          s += (b & 0xf).toString(16).toUpperCase()
+        }
       }
     }
     return s
